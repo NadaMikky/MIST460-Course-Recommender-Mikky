@@ -327,7 +327,7 @@ begin
 	from @tempTable;
 
 end;
-
+go
 
 -- 6. Example test: Cureently only gives a msg of:
 --    "Student x already enrolled inc course y"
@@ -385,6 +385,7 @@ begin
 	from RegistrationCourseOffering
 	where RegistrationID = @registrationID and CourseOfferingID = @courseOfferingID;
 end;
+go
 -- Section II: TRIGGERS - Business Rules HW4
 
 /* DONE- NADA
