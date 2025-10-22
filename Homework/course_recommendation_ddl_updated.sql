@@ -1,5 +1,5 @@
-use Homework3Group1;
--- File provided from Professor 
+use Database_objects_Mikky;
+GO
 
 -- Safety drops (order matters due to FKs)
 IF OBJECT_ID('AlumJob')        IS NOT NULL DROP TABLE AlumJob;
@@ -83,6 +83,7 @@ CREATE TABLE Course (
     CourseDescription     NVARCHAR(MAX)  NULL,
     Credits         DECIMAL(4,1)   NOT NULL CONSTRAINT DF_Course_Credits DEFAULT (3.0),
 	MajorsOnlyRequirement bit not null,
+	RecommendedCapacity int not null default(0),
     CONSTRAINT UQ_Course_SubjectNumber UNIQUE (SubjectCode, CourseNumber),
     CONSTRAINT CK_Course_Credits CHECK (Credits > 0 AND Credits <= 12.0)
 );
@@ -188,9 +189,11 @@ CREATE TABLE RegistrationCourseOffering (
     RegistrationID int not null,
 	CourseOfferingID    INT NOT NULL,
     EnrollmentStatus    NVARCHAR(12) NOT NULL, -- 'Enrolled','Waitlisted','Dropped','Completed'
-    LastUpdate			DATETIME2(3) NOT NULL CONSTRAINT DF_RegistrationCourseOffering DEFAULT SYSUTCDATETIME(),
+    LastUpdate			DATETIME2(3) NOT NULL 
+		CONSTRAINT DF_RegistrationCourseOffering DEFAULT SYSUTCDATETIME(),
     FinalGrade          NCHAR(2) NULL,
-	CONSTRAINT UQ_RegistrationCourseOffering UNIQUE (RegistrationID, CourseOfferingID),
+	CONSTRAINT UQ_RegistrationCourseOffering 
+		UNIQUE (RegistrationID, CourseOfferingID, EnrollmentStatus),
     constraint FK_RegistrationCourseOffering_Registration foreign key (RegistrationID)
 		references Registration(RegistrationID) on delete cascade,
 	CONSTRAINT FK_RegistrationCourseOffering_CourseOffering FOREIGN KEY (CourseOfferingID)

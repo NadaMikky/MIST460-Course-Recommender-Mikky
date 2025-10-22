@@ -1,5 +1,5 @@
-﻿-- File provided from professor
-USE Homework3Group1;
+﻿USE DATABASE_objects_Mikky;
+
 SET NOCOUNT ON;
 
 --BEGIN TRAN;
@@ -21,19 +21,19 @@ DECLARE @MajorCS  INT       = (SELECT MajorID FROM Major WHERE MajorName = N'Com
 -- 2) Courses (WVU MIS & CS examples)
 --    Titles reflect WVU catalog vernacular
 ------------------------------------------------------------
-INSERT INTO Course (SubjectCode, CourseNumber, Title, CourseDescription, Credits, MajorsOnlyRequirement) VALUES
- (N'MIST', N'320', N'Managing Information Technology', N'Overview of IT management in organizations.', 3.0, 0),
- (N'MIST', N'351', N'Database Management Systems',     N'Intro to database theory, design, implementation.', 3.0, 0),
- (N'MIST', N'352', N'Business Application Programming',N'Fundamentals of programming for business apps.', 3.0, 0),
- (N'MIST', N'353', N'Advanced Information Technology', N'Advanced IT topics and tools.', 3.0, 0),
- (N'MIST', N'355', N'Data Communications',             N'Networks and data communications concepts.', 3.0, 0),
- (N'MIST', N'450', N'Systems Analysis',                N'Systems approach; early SDLC phases.', 3.0, 0),
- (N'MIST', N'452', N'Systems Design/Development',      N'Later SDLC phases; UI, data & implementation.', 3.0, 0),
- (N'MIST', N'455', N'Introduction to Machine Learning',N'Foundations of machine learning.', 3.0, 0),
- (N'MIST', N'460', N'Analysis and Design of AI and ML Systems', N'Analyzing and Designing Systems integrating AI and ML.', 3.0, 1),
- (N'CS',   N'110', N'Introduction to Computer Science',N'Foundations of programming and problem solving.', 3.0, 0),
- (N'CS',   N'111', N'Introduction to Data Structures', N'Introductory data structures & algorithms.', 3.0, 0),
- (N'CS',   N'210', N'Intermediate Programming',        N'Object-oriented programming patterns and data.', 3.0, 0);
+INSERT INTO Course (SubjectCode, CourseNumber, Title, CourseDescription, Credits, MajorsOnlyRequirement, RecommendedCapacity) VALUES
+ (N'MIST', N'320', N'Managing Information Technology', N'Overview of IT management in organizations.', 3.0, 0, 100),
+ (N'MIST', N'351', N'Database Management Systems',     N'Intro to database theory, design, implementation.', 3.0, 0, 60),
+ (N'MIST', N'352', N'Business Application Programming',N'Fundamentals of programming for business apps.', 3.0, 0, 60),
+ (N'MIST', N'353', N'Advanced Information Technology', N'Advanced IT topics and tools.', 3.0, 0, 55),
+ (N'MIST', N'355', N'Data Communications',             N'Networks and data communications concepts.', 3.0, 0, 50),
+ (N'MIST', N'450', N'Systems Analysis',                N'Systems approach; early SDLC phases.', 3.0, 0, 35),
+ (N'MIST', N'452', N'Systems Design/Development',      N'Later SDLC phases; UI, data & implementation.', 3.0, 0, 35),
+ (N'MIST', N'455', N'Introduction to Machine Learning',N'Foundations of machine learning.', 3.0, 0, 35),
+ (N'MIST', N'460', N'Analysis and Design of AI and ML Systems', N'Analyzing and Designing Systems integrating AI and ML.', 3.0, 1, 30),
+ (N'CS',   N'110', N'Introduction to Computer Science',N'Foundations of programming and problem solving.', 3.0, 0, 80),
+ (N'CS',   N'111', N'Introduction to Data Structures', N'Introductory data structures & algorithms.', 3.0, 0, 40),
+ (N'CS',   N'210', N'Intermediate Programming',        N'Object-oriented programming patterns and data.', 3.0, 0, 30);
 
 DECLARE @cMIST320 INT = (SELECT CourseID FROM Course WHERE SubjectCode='MIST' AND CourseNumber='320');
 DECLARE @cMIST351 INT = (SELECT CourseID FROM Course WHERE SubjectCode='MIST' AND CourseNumber='351');
@@ -277,7 +277,6 @@ INSERT INTO RegistrationCourseOffering (RegistrationID, CourseOfferingID, Enroll
 VALUES
  (@regMJ,    @o320S23, N'Completed', N'A'),
  (@regSmith, @o320S23, N'Completed', N'A'),
- (@regMJ,    @o355S23, N'Completed', N'A'),
  (@regSmith, @o355S23, N'Completed', N'A');
 
 -- Additional enrollments so other students have history (and to exceed 5 rows)
