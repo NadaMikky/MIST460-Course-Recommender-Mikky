@@ -279,6 +279,28 @@ BEGIN
 END;
 GO
 
+create or alter procedure procEnrollStudentInCourseOfferingCalled
+(@studentID int, @courseOfferingID int)
+as
+begin
+	set nocount on;
+	declare @enrollmentSucceeded bit, @enrollmentResponse nvarchar(100);
+
+	execute @enrollmentSucceeded = procEnrollStudentInCourseOffering
+		@studentID = @studentID, @courseOfferingID = @courseOfferingID, 
+		@enrollmentResponse = @enrollmentResponse output;
+
+	declare @tempTable table(EnrollmentResponse nvarchar(100), EnrollmentSucceeded bit);
+
+	insert into @temptable(EnrollmentResponse, EnrollmentSucceeded)
+	values (@enrollmentResponse, @enrollmentSucceeded);
+
+	select EnrollmentResponse,EnrollmentSucceeded
+	from @tempTable;
+
+end;
+
+
 -- 6. Example test: Cureently only gives a msg of:
 --    "Student x already enrolled inc course y"
 -- EXEC dbo.procEnrollInCourseOffering @StudentID = 2, @CRN = 30003;
@@ -290,63 +312,51 @@ I want to be able to withdraw from a course offering
 
 So that I have an option to not continue taking that course offering.*/
 
-CREATE OR ALTER PROCEDURE dbo.procWithdrawFromCourseOffering
-    @StudentID INT,
-    @CourseOfferingID INT
-AS
-BEGIN
-    SET NOCOUNT ON;
+create or alter procedure procDropStudentFromCourseOffering
+(
+	@registrationID int, @courseOfferingID int
+)
+as
+begin
 
-    DECLARE @RegistrationCourseOfferingID INT, @CurrentStatus NVARCHAR(12);
+	set nocount on;
 
-    SELECT 
-        @RegistrationCourseOfferingID = RCO.RegistrationCourseOfferingID,
-        @CurrentStatus = RCO.EnrollmentStatus
-    FROM RegistrationCourseOffering RCO
-    JOIN Registration R ON R.RegistrationID = RCO.RegistrationID
-    JOIN Student S ON S.StudentID = R.StudentID
-    JOIN CourseOffering CO ON CO.CourseOfferingID = RCO.CourseOfferingID
-    WHERE R.StudentID = @StudentID AND RCO.CourseOfferingID = @CourseOfferingID;
+	update RegistrationCourseOffering
+	set EnrollmentStatus = 'Dropped',
+		LastUpdate = GETDATE()
+	where RegistrationID = @registrationID
+	     and CourseOfferingID  = @courseOfferingID;
 
-    IF @RegistrationCourseOfferingID IS NULL
-        THROW 51001, 'Student not enrolled in specified course offering or invalid IDs.', 1;
-    IF @CurrentStatus = N'Completed'
-        THROW 51002, 'Cannot withdraw from completed course.', 1;
-    IF @CurrentStatus = N'Dropped'
-        THROW 51003, 'Student already withdrawn from this course.', 1;
+end;
 
-    BEGIN TRANSACTION;
-    BEGIN TRY
-        UPDATE RegistrationCourseOffering
-        SET EnrollmentStatus = N'Dropped', LastUpdate = SYSUTCDATETIME(), FinalGrade = NULL
-        WHERE RegistrationCourseOfferingID = @RegistrationCourseOfferingID;
-
-        IF @CurrentStatus = N'Enrolled'
-            UPDATE CourseOffering SET NumberSeatsRemaining = NumberSeatsRemaining + 1 
-            WHERE CourseOfferingID = @CourseOfferingID;
-
-        COMMIT TRANSACTION;
-        
-        SELECT RegistrationCourseOfferingID, RegistrationID, CourseOfferingID, 
-               EnrollmentStatus, LastUpdate, FinalGrade
-        FROM RegistrationCourseOffering 
-        WHERE RegistrationCourseOfferingID = @RegistrationCourseOfferingID;
-    END TRY
-    BEGIN CATCH
-        ROLLBACK TRANSACTION;
-        THROW;
-    END CATCH;
-END;
-GO
-
-DECLARE @StudentID INT = 1;
-DECLARE @OfferingID INT = (SELECT TOP 1 CourseOfferingID FROM CourseOffering WHERE CRN = 10005);
-
-/* Test Example:
-EXEC dbo.procWithdrawFromCourseOffering @StudentID = @StudentID, @CourseOfferingID = @OfferingID;
+/*
+execute procDropStudentFromCourseOffering
+	@studentID = 1, @courseOfferingID = 15
 */
-go 
 
+go
+
+create or alter procedure procDropStudentFromCourseOfferingCalled
+(
+	@studentID int, @courseOfferingID int
+)
+as
+begin
+	set nocount on;
+
+	declare @registrationID int;
+
+	select @registrationID = RegistrationID
+	from Registration
+	where StudentID = @studentID;
+
+	execute procDropStudentFromCourseOffering @registrationID = @registrationID, 
+	@courseOfferingID = @courseOfferingID;
+
+	select EnrollmentStatus, RegistrationID, CourseOfferingID, LastUpdate
+	from RegistrationCourseOffering
+	where RegistrationID = @registrationID and CourseOfferingID = @courseOfferingID;
+end;
 -- Section II: TRIGGERS - Business Rules HW4
 
 /* DONE- NADA
