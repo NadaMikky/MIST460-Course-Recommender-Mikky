@@ -9,21 +9,20 @@ import pyodbc
 # Database connection parameters
 DB_SERVER = 'localhost'
 DB_DATABASE = 'Homework3Group1'
-DB_USERNAME = 'your_username' #not needed
-DB_PASSWORD = 'your_password' # not needed 
 DB_DRIVER = '{ODBC Driver 17 for SQL Server}'
 
 
 def get_db_connection():
     try:
-        conn_str = (
-            f'DRIVER={DB_DRIVER};'
-            f'SERVER={DB_SERVER};'
-            f'DATABASE={DB_DATABASE};'
-            f'Trusted_Connection=yes;'
-        )
+        conn_str = f"DRIVER={DB_DRIVER};SERVER={DB_SERVER};DATABASE={DB_DATABASE};Trusted_Connection=yes;"
         return pyodbc.connect(conn_str)
-    except Exception as e:
-        print(f"ERROR connecting to database: {e}")
+    except Exception:
         raise HTTPException(status_code=500, detail="Database connection error")
+
+
+def _rows_to_dicts(cursor, rows):
+    if not cursor.description:
+        return []
+    cols = [c[0] for c in cursor.description]
+    return [dict(zip(cols, row)) for row in rows]
 
