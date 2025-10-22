@@ -1,4 +1,4 @@
-use Database_objects_Mikky;
+USE Homework3Group1;
 GO
 
 -- Safety drops (order matters due to FKs)

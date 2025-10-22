@@ -1,4 +1,4 @@
-﻿USE DATABASE_objects_Mikky;
+﻿USE Homework3Group1;
 
 SET NOCOUNT ON;
 
