@@ -180,16 +180,23 @@ BEGIN
         INNER JOIN StudentCompletions SC
           ON SC.CourseID = P.CourseID
     )
-    SELECT SubjectCode,
-           CourseNumber,
-           HasCompleted
-    FROM Evaluation
+    -- Materialize evaluation results into a temp table so we can return multiple resultsets
+    SELECT SubjectCode, CourseNumber, HasCompleted
+    INTO #EvaluationTemp
+    FROM Evaluation;
+
+    -- Return the list of prerequisites (with HasCompleted)
+    SELECT SubjectCode, CourseNumber, HasCompleted
+    FROM #EvaluationTemp
     ORDER BY SubjectCode, CourseNumber;
 
-    SELECT CASE WHEN EXISTS (SELECT 1 FROM Evaluation WHERE HasCompleted = 0)
+    -- Return the scalar indicating whether all prerequisites are met
+    SELECT CASE WHEN EXISTS (SELECT 1 FROM #EvaluationTemp WHERE HasCompleted = 0)
                 THEN CAST(0 AS BIT)
                 ELSE CAST(1 AS BIT)
            END AS MeetsAllPrerequisites;
+
+    DROP TABLE #EvaluationTemp;
 END;
 GO
 
