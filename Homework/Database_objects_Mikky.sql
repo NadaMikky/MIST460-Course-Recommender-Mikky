@@ -145,60 +145,20 @@ GO
    Improvement: replace left join with normal join to save space and for better logic
 ================================================================================= */
 CREATE OR ALTER PROCEDURE dbo.procCheckIfStudentMeetsPrerequisites
-    @StudentID INT,
-    @SubjectCode NVARCHAR(20),
-    @CourseNumber NVARCHAR(20)
-AS
-BEGIN
-    SET NOCOUNT ON;
+  (
+	@studentID int, @subjectCode nvarchar(10), @courseNumber nvarchar(10)
+)
+as
+begin
+	
+	SELECT SubjectCode, CourseNumber 
+	FROM fnFindCoursePrerequisites(@subjectCode, @courseNumber)
+	EXCEPT
+	SELECT SubjectCode, CourseNumber
+	FROM fnFindAllCoursesTakenByStudent(@studentID);
+		
+end;
 
-    ;WITH Prereqs AS (
-        SELECT 
-            CP.PrereqCourseID AS CourseID,
-            P.SubjectCode,
-            P.CourseNumber
-        FROM CoursePrerequisite CP
-        JOIN Course C ON C.CourseID = CP.CourseID
-        JOIN Course P ON P.CourseID = CP.PrereqCourseID
-        WHERE C.SubjectCode = @SubjectCode
-          AND C.CourseNumber = @CourseNumber
-    ),
-    StudentCompletions AS (
-        SELECT DISTINCT CO.CourseID
-        FROM RegistrationCourseOffering RCO
-        JOIN Registration R ON R.RegistrationID = RCO.RegistrationID
-        JOIN CourseOffering CO ON CO.CourseOfferingID = RCO.CourseOfferingID
-        WHERE R.StudentID = @StudentID
-          AND RCO.EnrollmentStatus = N'Completed'
-    ),
-    Evaluation AS (
-        SELECT 
-            P.SubjectCode,
-            P.CourseNumber,
-            CAST(1 AS BIT) AS HasCompleted
-        FROM Prereqs P
-        INNER JOIN StudentCompletions SC
-          ON SC.CourseID = P.CourseID
-    )
-    -- Materialize evaluation results into a temp table so we can return multiple resultsets
-    SELECT SubjectCode, CourseNumber, HasCompleted
-    INTO #EvaluationTemp
-    FROM Evaluation;
-
-    -- Return the list of prerequisites (with HasCompleted)
-    SELECT SubjectCode, CourseNumber, HasCompleted
-    FROM #EvaluationTemp
-    ORDER BY SubjectCode, CourseNumber;
-
-    -- Return the scalar indicating whether all prerequisites are met
-    SELECT CASE WHEN EXISTS (SELECT 1 FROM #EvaluationTemp WHERE HasCompleted = 0)
-                THEN CAST(0 AS BIT)
-                ELSE CAST(1 AS BIT)
-           END AS MeetsAllPrerequisites;
-
-    DROP TABLE #EvaluationTemp;
-END;
-GO
 
 -- Example test: Checks if you have completed prerequisites for specified course
 -- EXEC dbo.procCheckIfStudentMeetsPrerequisites @StudentID = 1, @SubjectCode = 'MIST', @CourseNumber = '460'
