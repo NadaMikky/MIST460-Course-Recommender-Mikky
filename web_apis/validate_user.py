@@ -4,6 +4,7 @@ from web_apis.course_recommender_apis import get_db_connection, _rows_to_dicts
 
 router = APIRouter()
 
+# 1. validate_user
 @router.post("/validate_user")
 def validate_user(payload: Dict[str, str] = Body(...)):
     # simple input check

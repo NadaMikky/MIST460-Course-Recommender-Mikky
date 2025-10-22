@@ -3,6 +3,7 @@ from web_apis.course_recommender_apis import get_db_connection, _rows_to_dicts
 
 router = APIRouter()
 
+# 3. find_prerequisites
 @router.get("/find_prerequisites")
 def find_prerequisites(subject_code: str = Query(...), course_number: str = Query(...)):
     conn = get_db_connection()

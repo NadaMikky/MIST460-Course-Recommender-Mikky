@@ -5,6 +5,7 @@ import pyodbc
 
 router = APIRouter()
 
+# 5. enroll_student_in_course_offering 
 @router.post("/enroll_student_in_course_offering")
 def enroll_student(payload: Dict[str, Any] = Body(...)):
     student_id = payload.get("student_id")

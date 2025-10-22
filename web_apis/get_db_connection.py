@@ -2,6 +2,9 @@ from fastapi import FastAPI, HTTPException
 import uvicorn
 import pyodbc
 
+# This file is for database connection function used by other modules like course_recommender_apis.py
+# What it does? 
+# it establishes and returns a connection to the SQL Server database using pyodbc.
 
 # Database connection parameters
 DB_SERVER = 'localhost'

@@ -2,7 +2,9 @@ import pyodbc
 from fastapi import HTTPException
 from typing import List, Dict, Any
 
-# Database connection parameters (adjust as needed)
+# This file contains common database utility functions 
+# used by other modules like course_recommender_apis.py.
+# Database connection parameters
 DB_SERVER = 'localhost'
 DB_DATABASE = 'Homework3Group1'
 DB_DRIVER = '{ODBC Driver 17 for SQL Server}'

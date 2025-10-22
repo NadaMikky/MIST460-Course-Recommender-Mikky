@@ -3,6 +3,7 @@ from web_apis.course_recommender_apis import get_db_connection, _rows_to_dicts
 
 router = APIRouter()
 
+# 6. get_student_enrolled_course_offerings
 @router.get("/get_student_enrolled_course_offerings")
 def get_enrollments(student_id: int = Query(...)):
     conn = get_db_connection()

@@ -5,7 +5,9 @@ import pyodbc
 
 router = APIRouter()
 
+# 7. drop_student_from_course_offering
 @router.post("/drop_student_from_course_offering")
+# takes student_id and course_offering_id from payload
 def drop_student(payload: Dict[str, Any] = Body(...)):
     student_id = payload.get("student_id")
     course_offering_id = payload.get("course_offering_id")
@@ -15,6 +17,7 @@ def drop_student(payload: Dict[str, Any] = Body(...)):
     conn = get_db_connection()
     cur = conn.cursor()
     try:
+        # excute stored procedure to drop student 
         cur.execute("{CALL procDropStudentFromCourseOfferingCalled(?, ?)}", (int(student_id), int(course_offering_id)))
         try:
             rows = cur.fetchall()

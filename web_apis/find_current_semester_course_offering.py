@@ -3,6 +3,7 @@ from web_apis.get_db_connection import get_db_connection
 
 router = APIRouter()
 
+# 2. find_current_semester_course_offerings
 @router.get("/find_current_semester_course_offerings")
 def find_current_semester_course_offerings(subject_code: str = Query(...), course_number: str = Query(...)):
     # open DB connection and call stored procedure
