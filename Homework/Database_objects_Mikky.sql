@@ -137,6 +137,34 @@ GO
 -- Example test:
 -- EXEC dbo.procFindPrerequisites @SubjectCode = 'MIST', @CourseNumber = '452'
 
+CREATE OR ALTER FUNCTION fnFindAllCoursesTakenByStudent
+(
+	--@StudentFullname nvarchar(100)
+	@studentID int
+)
+returns table
+as
+return
+	select /*A.FullName, R.RegistrationID, CRN, CO.CourseOfferingYear,*/ C.SubjectCode, C.CourseNumber
+	from 
+	/*AppUser A join Student S
+		on A.AppUserID = S.StudentID
+		join*/ Registration R
+		--on R.StudentID = S.StudentID
+		join RegistrationCourseOffering RCO
+		on R.RegistrationID = RCO.RegistrationID
+		join CourseOffering CO
+		on RCO.CourseOfferingID = CO.CourseOfferingID
+		join Course C
+		on CO.CourseID = C.CourseID
+		where R.StudentID = @studentID
+		--where A.FullName = @StudentFullname --@fullname
+
+/*
+SELECT SubjectCode, CourseNumber
+FROM fnFindAllCoursesTakenByStudent(1);
+*/
+
 
 /* =================================================================================
    4. As a student
@@ -370,18 +398,16 @@ on registrationCourseOffering -- table where event is happening
 -- delete ( removes table) 
 -- updated (deleted, inserted)
 after insert 
-
 as
 begin
+	declare @courseOfferingID int;
+	select @courseOfferingID = CourseOfferingID	
+	from inserted;
 
-declare @courseOfferingID int;
-select @courseOfferingID = CourseOfferingID
-from inserted;
-
-update CourseOffering
-set NumberSeatsRemaining = NumberSeatsRemaining -1
-where  CourseOfferingID = @courseOfferingID;
-END;
+	update CourseOffering
+	set NumberSeatsRemaining = NumberSeatsRemaining - 1
+	where CourseOfferingID = @courseOfferingID;
+end;
 GO
 /*
 TEST EXAMPLE: WORKS
