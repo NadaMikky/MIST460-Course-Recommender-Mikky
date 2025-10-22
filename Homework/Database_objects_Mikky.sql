@@ -3,6 +3,26 @@
 -- Description: Deliverable file, contains Stored Procedures, UDFs, and Triggers for MIS assignment
 USE Homework3Group1;
 GO
+
+create or alter procedure procValidateUser
+(@username nvarchar(320), @password nvarchar(100))
+as
+begin
+	select AppUserID, FullName
+	from AppUser
+	where Email = @username and
+		PasswordHash = CONVERT(VARBINARY(64), @password, 1)
+end;
+
+/*
+execute procValidateUser
+@username = 'mjordan@wvu.edu', 
+@password = '0x01';
+
+select AppUserID, FullName, email, PasswordHash
+from AppUser
+*/
+
 -- Section I: stored procedures and user defined functions
 /* =================================================================================
    1. As a student

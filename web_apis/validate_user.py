@@ -17,9 +17,10 @@ def validate_user(payload: Dict[str, str] = Body(...)):
     cur = conn.cursor()
     try:
         cur.execute("{CALL procValidateUser(?, ?)}", (username, password))
-        row = cur.fetchone()
+        row = cur.fetchone() # get first row of resultset
         if not row:
             return {"valid": False}
+        
         cols = [c[0] for c in cur.description] if cur.description else []
         user = {cols[i]: row[i] for i in range(len(cols))}
         return {"valid": True, "user": user}
