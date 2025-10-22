@@ -1,11 +1,15 @@
+from fastapi import FastAPI, HTTPException
+import uvicorn
 import pyodbc
-from fastapi import HTTPException
-from typing import List, Dict, Any
 
-# Database connection parameters (adjust as needed)
+
+# Database connection parameters
 DB_SERVER = 'localhost'
 DB_DATABASE = 'Homework3Group1'
+DB_USERNAME = 'your_username' #not needed
+DB_PASSWORD = 'your_password' # not needed 
 DB_DRIVER = '{ODBC Driver 17 for SQL Server}'
+
 
 def get_db_connection():
     try:
@@ -17,14 +21,6 @@ def get_db_connection():
         )
         return pyodbc.connect(conn_str)
     except Exception as e:
+        print(f"ERROR connecting to database: {e}")
         raise HTTPException(status_code=500, detail="Database connection error")
 
-def _rows_to_dicts(cursor, rows) -> List[Dict[str, Any]]:
-    cols = [c[0] for c in cursor.description] if cursor.description else []
-    result = []
-    for row in rows:
-        row_dict = {}
-        for idx, col in enumerate(cols):
-            row_dict[col] = row[idx]
-        result.append(row_dict)
-    return result
