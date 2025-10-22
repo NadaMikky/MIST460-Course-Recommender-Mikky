@@ -13,7 +13,7 @@ begin
 	where Email = @username and
 		PasswordHash = CONVERT(VARBINARY(64), @password, 1)
 end;
-
+go
 /*
 execute procValidateUser
 @username = 'mjordan@wvu.edu', 
