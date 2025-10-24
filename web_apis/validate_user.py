@@ -1,6 +1,7 @@
 from fastapi import APIRouter, HTTPException, Body
 from typing import Dict, Any
-from web_apis.course_recommender_apis import get_db_connection, _rows_to_dicts
+from web_apis.get_db_connection import get_db_connection, _rows_to_dicts
+import pyodbc
 
 router = APIRouter()
 
@@ -16,7 +17,8 @@ def validate_user(payload: Dict[str, str] = Body(...)):
     conn = get_db_connection()
     cur = conn.cursor()
     try:
-        cur.execute("{CALL procValidateUser(?, ?)}", (username, password))
+        # use schema-qualified procedure name
+        cur.execute("EXEC dbo.procValidateUser ?, ?", (username, password))
         row = cur.fetchone() # get first row of resultset
         if not row:
             return {"valid": False}
@@ -24,6 +26,14 @@ def validate_user(payload: Dict[str, str] = Body(...)):
         cols = [c[0] for c in cur.description] if cur.description else []
         user = {cols[i]: row[i] for i in range(len(cols))}
         return {"valid": True, "user": user}
+    except pyodbc.Error as e:
+        msg = str(e)
+        if "Could not find stored procedure" in msg or "2812" in msg:
+            raise HTTPException(
+                status_code=500,
+                detail="Stored procedure dbo.procValidateUser not found. Run Database_objects_Mikky.sql against Homework3Group1."
+            )
+        raise HTTPException(status_code=500, detail=msg)
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
     finally:

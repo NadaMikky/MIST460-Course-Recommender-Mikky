@@ -4,16 +4,17 @@
 USE Homework3Group1;
 GO
 
-create or alter procedure procValidateUser
-(@username nvarchar(320), @password nvarchar(100))
-as
-begin
-	select AppUserID, FullName
-	from AppUser
-	where Email = @username and
-		PasswordHash = CONVERT(VARBINARY(64), @password, 1)
-end;
-go
+CREATE OR ALTER PROCEDURE dbo.procValidateUser
+(@username NVARCHAR(320), @password NVARCHAR(100))
+AS
+BEGIN
+    SELECT AppUserID, FullName
+    FROM dbo.AppUser
+    WHERE Email = @username
+      AND PasswordHash = CONVERT(VARBINARY(64), @password, 1);
+END;
+GO
+
 /*
 execute procValidateUser
 @username = 'mjordan@wvu.edu', 
@@ -159,7 +160,7 @@ return
 		on CO.CourseID = C.CourseID
 		where R.StudentID = @studentID
 		--where A.FullName = @StudentFullname --@fullname
-
+go
 /*
 SELECT SubjectCode, CourseNumber
 FROM fnFindAllCoursesTakenByStudent(1);
@@ -314,11 +315,14 @@ begin
 	set nocount on;
 	declare @enrollmentSucceeded bit, @enrollmentResponse nvarchar(100);
 
-	execute @enrollmentSucceeded = procEnrollStudentInCourseOffering
-		@studentID = @studentID, @courseOfferingID = @courseOfferingID, 
-		@enrollmentResponse = @enrollmentResponse output;
+	execute dbo.procEnrollInCourseOffering
+    @StudentID = @studentID,
+    @CRN = @courseOfferingID;
 
 	declare @tempTable table(EnrollmentResponse nvarchar(100), EnrollmentSucceeded bit);
+
+    set @enrollmentResponse = 'Enrollment successful';
+    set @enrollmentSucceeded = 1;
 
 	insert into @temptable(EnrollmentResponse, EnrollmentSucceeded)
 	values (@enrollmentResponse, @enrollmentSucceeded);
@@ -356,13 +360,11 @@ begin
 	     and CourseOfferingID  = @courseOfferingID;
 
 end;
-
+go
 /*
 execute procDropStudentFromCourseOffering
 	@studentID = 1, @courseOfferingID = 15
 */
-
-go
 
 create or alter procedure procDropStudentFromCourseOfferingCalled
 (
