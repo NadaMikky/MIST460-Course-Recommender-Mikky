@@ -1,3 +1,4 @@
+#get_db_connection.py : this file is for database connection function used by other modules like course_recommender_apis.py
 from fastapi import FastAPI, HTTPException
 import uvicorn
 import pyodbc
@@ -15,37 +16,38 @@ load_dotenv(dotenv_path=path)
 
 
 def get_db_connection():
-    environment = os.getenv('ENVIRONMENT')
+    environment = os.getenv("ENVIRONMENT", "development")
 
-    if environment == 'production':
-        DB_SERVER = os.getenv('DB_SERVER')
-        DB_DATABASE = os.getenv('DB_NAME')
-        DB_USERNAME = os.getenv('DB_USERNAME')
-        DB_PASSWORD = os.getenv('DB_PASSWORD')
-        DB_DRIVER = os.getenv('DB_DRIVER')
+    if environment == "production":
+        # Azure SQL settings
+        DB_SERVER = os.getenv("DB_SERVER")       # e.g. your-server.database.windows.net
+        DB_DATABASE = os.getenv("DB_NAME")       # Course_Recommender_MikkyDB
+        DB_USERNAME = os.getenv("DB_USERNAME")
+        DB_PASSWORD = os.getenv("DB_PASSWORD")
+        DB_DRIVER = os.getenv("DB_DRIVER", "{ODBC Driver 18 for SQL Server}")
 
         connection_string = (
-            f'DRIVER={DB_DRIVER};'
-            f'SERVER={DB_SERVER};'
-            f'DATABASE={DB_DATABASE};'
-            f'UID={DB_USERNAME};'
-            f'PWD={DB_PASSWORD};'
-            'Encrypt=yes;'
-            'TrustServerCertificate=no;'
-            'Connection Timeout=30;'
+            f"DRIVER={DB_DRIVER};"
+            f"SERVER={DB_SERVER};"
+            f"DATABASE={DB_DATABASE};"
+            f"UID={DB_USERNAME};"
+            f"PWD={DB_PASSWORD};"
+            "Encrypt=yes;"
+            "TrustServerCertificate=no;"
+            "Connection Timeout=30;"
         )
-    else: 
-        #local development settings
-        DB_SERVER = 'localhost'
-        DB_DATABASE = 'Homework3Group1'
-        DB_DRIVER = '{ODBC Driver 17 for SQL Server}'
+    else:
+        # Local SQL Server settings
+        DB_SERVER = "localhost"
+        DB_DATABASE = "Homework3Group1"
+        DB_DRIVER = "{ODBC Driver 17 for SQL Server}"
 
         connection_string = (
-            f'DRIVER={DB_DRIVER};'
-            f'SERVER={DB_SERVER};'
-            f'DATABASE={DB_DATABASE};'
-            'Trusted_Connection=yes;'
-            'Connection Timeout=30;'
+            f"DRIVER={DB_DRIVER};"
+            f"SERVER={DB_SERVER};"
+            f"DATABASE={DB_DATABASE};"
+            "Trusted_Connection=yes;"
+            "Connection Timeout=30;"
         )
 
     try:
