@@ -1,4 +1,4 @@
-USE Homework3Group1;
+-- USE Homework3Group1;
 GO
 
 -- Safety drops (order matters due to FKs)

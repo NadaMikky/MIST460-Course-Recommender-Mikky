@@ -1,7 +1,7 @@
 -- Homework 3 - Group 1
 -- Authors: Nada Mikky, Jaxon Fielding, Olivia Gottlieb
 -- Description: Deliverable file, contains Stored Procedures, UDFs, and Triggers for MIS assignment
-USE Homework3Group1;
+-- USE Homework3Group1;
 GO
 
 CREATE OR ALTER PROCEDURE dbo.procValidateUser

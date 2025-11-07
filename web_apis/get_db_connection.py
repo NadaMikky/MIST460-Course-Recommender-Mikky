@@ -21,7 +21,7 @@ def get_db_connection():
     if environment == "production":
         # Azure SQL settings
         DB_SERVER = os.getenv("DB_SERVER")       # e.g. your-server.database.windows.net
-        DB_DATABASE = os.getenv("DB_NAME")       # Course_Recommender_MikkyDB
+        DB_DATABASE = os.getenv("DB_DATABASE")       # Course_Recommender_MikkyDB
         DB_USERNAME = os.getenv("DB_USERNAME")
         DB_PASSWORD = os.getenv("DB_PASSWORD")
         DB_DRIVER = os.getenv("DB_DRIVER", "{ODBC Driver 18 for SQL Server}")
