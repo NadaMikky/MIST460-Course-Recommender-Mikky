@@ -188,7 +188,7 @@ begin
 		
 end;
 
-
+go
 -- Example test: Checks if you have completed prerequisites for specified course
 -- EXEC dbo.procCheckIfStudentMeetsPrerequisites @StudentID = 1, @SubjectCode = 'MIST', @CourseNumber = '460'
 
